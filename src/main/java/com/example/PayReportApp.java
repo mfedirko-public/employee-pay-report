@@ -1,6 +1,9 @@
 package com.example;
 
+import com.example.report.CommissionedEmployeeReportExtension;
 import com.example.report.EmployeePayReport;
+import com.example.report.HourlyEmployeeReportExtension;
+import com.example.report.SalariedEmployeeReportExtension;
 import com.example.timesheet.CommissionedEmployeeTimesheet;
 import com.example.timesheet.EmployeeTimesheet;
 import com.example.timesheet.HourlyEmployeeTimesheet;
@@ -17,7 +20,10 @@ public class PayReportApp {
 
     public static void main(String[] args) {
         final OutputStream os = System.out;
-        EmployeePayReport report = new EmployeePayReport(getTimesheetData());
+        EmployeePayReport report = new EmployeePayReport(getTimesheetData())
+            .withExtension(new SalariedEmployeeReportExtension())
+            .withExtension(new CommissionedEmployeeReportExtension())
+            .withExtension(new HourlyEmployeeReportExtension());
         report.printHeader(os);
         report.printRows(os);
         report.printFooter(os);

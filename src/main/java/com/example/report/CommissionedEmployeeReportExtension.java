@@ -27,10 +27,7 @@ public class CommissionedEmployeeReportExtension implements EmployeePayReportExt
     }
 
     @Override
-    public List<TableHeader> getHeaders(String employeeType) {
-        if (!CommissionedEmployeeTimesheet.COMMISSIONED_EMPLOYEE.equals(employeeType)) {
-            return Collections.emptyList();
-        }
+    public List<TableHeader> getHeaders() {
         return Collections.singletonList(
                 new TableHeader(HEADER_SALES, 3, 15)
         );

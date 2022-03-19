@@ -18,13 +18,11 @@ public class EmployeePayReport {
 
     public EmployeePayReport(List<EmployeeTimesheet> timesheets) {
         this.timesheets = timesheets;
-        this.extensions.add(new SalariedEmployeeReportExtension());
-        this.extensions.add(new CommissionedEmployeeReportExtension());
-        this.extensions.add(new HourlyEmployeeReportExtension());
     }
 
-    public void addExtension(EmployeePayReportExtension ext) {
+    public EmployeePayReport withExtension(EmployeePayReportExtension ext) {
         this.extensions.add(ext);
+        return this;
     }
 
     public void printHeader(OutputStream os) {
@@ -48,7 +46,7 @@ public class EmployeePayReport {
     private List<TableHeader> getHeaders() {
         if (this.headers == null) {
             List<TableHeader> hdrs = new ArrayList<>();
-            getEmployeeTypes(this.timesheets).forEach(empType -> addExtendedHeaders(empType, hdrs));
+            addExtendedHeaders(hdrs);
             addDefaultHeaders(hdrs);
             this.headers = hdrs.stream()
                     // sort by position. For any duplicate positions, sort them by name
@@ -91,8 +89,8 @@ public class EmployeePayReport {
                 .collect(Collectors.toSet());
     }
 
-    private void addExtendedHeaders(String empType, List<TableHeader> headers) {
-        extensions.forEach(ext -> headers.addAll(ext.getHeaders(empType)));
+    private void addExtendedHeaders(List<TableHeader> headers) {
+        extensions.forEach(ext -> headers.addAll(ext.getHeaders()));
     }
 
     private void addDefaultHeaders(List<TableHeader> headers) {

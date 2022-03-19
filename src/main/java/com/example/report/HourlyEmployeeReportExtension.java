@@ -34,10 +34,7 @@ public class HourlyEmployeeReportExtension implements EmployeePayReportExtension
     }
 
     @Override
-    public List<TableHeader> getHeaders(String employeeType) {
-        if (!HourlyEmployeeTimesheet.HOURLY_EMPLOYEE.equals(employeeType)) {
-            return Collections.emptyList();
-        }
+    public List<TableHeader> getHeaders() {
         List<TableHeader> headers = new ArrayList<>();
         headers.add(new TableHeader(HEADER_HOURS, 2, 8));
         headers.add(new TableHeader(HEADER_RATE, 2, 15));

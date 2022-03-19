@@ -12,7 +12,7 @@ public interface EmployeePayReportExtension {
     default Object getCellValue(String header, EmployeeTimesheet line) {
         throw new IllegalStateException("Cell value not implemented for header: " + header);
     }
-    default List<TableHeader> getHeaders(String employeeType) {
+    default List<TableHeader> getHeaders() {
         return Collections.emptyList();
     }
     default String getAdditionalFooter() {
