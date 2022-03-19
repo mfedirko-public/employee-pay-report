@@ -15,9 +15,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EmployeePayReportTest {
-    private static final Charset CHARSET = Charset.forName("UTF-8");
-    private OutputStream out = new ByteArrayOutputStream();
+class EmployeePayReportTest extends AbstractPayReportTest {
 
     @Test
     void noTimeSheets() throws Exception {
@@ -165,32 +163,41 @@ class EmployeePayReportTest {
         assertTotalMatches(timesheets, text);
     }
 
-    private void validateRow(String name, String empClass, String row) {
-        assertTrue(row.contains(name), "Expected row to contain name of " + name + ". Actual: \n" + row);
-        assertTrue(row.contains(empClass), "Expected row to contain class of " + empClass + ". Actual: \n" + row);
-        assertTrue(row.contains(empClass), "Expected row to contain weekly pay of " + "$" + ". Actual: \n" + row);
-    }
+    @Test
+    public void whenExtensionHeader_andNoData_thenExtensionHeaderVisible() {
+        List<EmployeeTimesheet> timesheets = Collections.emptyList();
 
-    private void assertTotalMatches(List<EmployeeTimesheet> timesheets, String text) {
-        BigDecimal total = BigDecimal.ZERO;
-        for (EmployeeTimesheet ts : timesheets) {
-            total = total.add(ts.getPayAmount());
-        }
-        String expectedTotalStr = NumberFormat.getCurrencyInstance(Locale.US).format(total);
-        assertTotalEquals(expectedTotalStr, text);
-    }
-    private void assertTotalEquals(String total, String text) {
-        assertTrue(text.contains("TOTAL " + total),
-                "Expected Total of " + total + ". Actual: \n" + text);
-    }
+        EmployeePayReport rpt = new EmployeePayReport(timesheets)
+                .withExtension(new EmployeePayReportExtension() {
 
-    private void assertHasDefaultHeaders(String text) {
+                    @Override
+                    public boolean supportsCell(String header, EmployeeTimesheet line) {
+                        return "MyHdr".equals(header);
+                    }
+
+                    @Override
+                    public Object getCellValue(String header, EmployeeTimesheet line) {
+                        return "My header value!";
+                    }
+
+                    @Override
+                    public List<TableHeader> getHeaders() {
+                        return Collections.singletonList(
+                                new TableHeader("MyHdr", 7, 50));
+                    }
+                });
+        rpt.printHeader(out);
+        rpt.printRows(out);
+        rpt.printFooter(out);
+
+        final String text = out.toString();
         final String headerLine = text.split(System.lineSeparator())[0].trim();
         final String multiSpace = "\\s{2,}";
         String[] headers = headerLine.split(multiSpace);
-        assertArrayEquals(new String[]{"Name", "Class", "Weekly Pay"}, headers,
-                "Expected default headers. Actual: " + headerLine);
+        assertArrayEquals(new String[]{"Name", "Class", "MyHdr", "Weekly Pay"}, headers);
+        assertTotalMatches(timesheets, text);
     }
+
 
 
 }
